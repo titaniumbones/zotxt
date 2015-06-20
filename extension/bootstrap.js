@@ -517,6 +517,26 @@ let selectEndpoint = function (url, data, sendResponseCallback) {
                          JSON.stringify("success", null, "  "));
 };
 
+let scanData = function(data) {
+    try {
+        loadZotero();
+        var  x = z.Zotero_RTFScan ;
+        x.inputFile = "/home/matt/GTD/Reference.odt";
+        x.outputFile = "/home/matt/GTD/Reference_munged.odt";
+        x._scanODF();
+        return "really no error thrown";
+    }
+    catch (err) {return err;}
+    //finally { return "no error"; }
+};
+
+let scanODFEndpoint = function (url, data, sendResponseCallback) {
+    let processedData = scanData(data);
+    // sendResponseCallback(200, "application/vnd.oasis.opendocument.text", processedData);
+    sendResponseCallback(400, "text/plain", "response acquired: " + processedData);
+};
+
+
 let endpoints = {
     "bibliography" : {
         supportedMethods:  ["POST"],
@@ -537,6 +557,13 @@ let endpoints = {
         supportedMethods:["GET"],
         supportedDataType : ["application/x-www-form-urlencoded"],
         init : itemsEndpoint
+    },
+    "scanODF" : {
+        supportedMethods:  ["POST", "GET"],
+        //supportedDataTypes: ["application/vnd.oasis.opendocument.text"],
+        //supportedDataTypes: ["text/plain"],
+        supportedDataType : ["application/x-www-form-urlencoded"],
+        init : scanODFEndpoint
     },
     "select" : {
         supportedMethods:["GET"],
